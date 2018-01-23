@@ -8,8 +8,7 @@ const CompressionPlugin = require('compression-webpack-plugin');
 module.exports = {
 
   entry: {
-    home: path.join(__dirname, 'src', 'js', 'index.js'),
-    about: path.join(__dirname, 'src', 'js', 'about.js')
+    home: path.join(__dirname, 'src', 'js', 'index.js')
   },
 
   output: {
@@ -49,7 +48,7 @@ module.exports = {
         ],
         use: ExtractTextPlugin.extract({fallback: 'style-loader', use: ['css-loader', 'sass-loader']})
       },
-      // rule for .glsl files (shaders)
+      // rule for GLSL shaders files
       {
         test: /\.(glsl|vert|frag)$/,
         use: [
@@ -93,12 +92,6 @@ module.exports = {
       hash: true,
       filename: 'index.html',
       chunks: ['commons', 'home']
-    }),
-    new HtmlWebpackPlugin({
-      template: path.join(__dirname, 'src', 'templates', 'about.html'),
-      hash: true,
-      filename: 'about.html',
-      chunks: ['commons', 'about']
     }),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'commons',

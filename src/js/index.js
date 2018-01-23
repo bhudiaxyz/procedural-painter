@@ -43,20 +43,13 @@ class Application {
     this.setupHelpers();
     this.setupFloor();
     this.setupControls();
+    this.setupCube();
+
     this.setupGUI();
 
-    {
-      const side = 20;
-      const geometry = new THREE.CubeGeometry(side, side, side);
-      const material = new THREE.MeshLambertMaterial({ color: 0xFBBC05 });
-      const cube = new THREE.Mesh(geometry, material);
-      cube.position.set(0, side / 2, 0);
-      this.scene.add(cube);
-    }
-
     this.setupCustomObject();
-    this.addParticleSystem();
-    this.addGroupObject();
+    this.setupParticleSystem();
+    this.setupGroupObject();
   }
 
   render() {
@@ -108,26 +101,39 @@ class Application {
     this.scene.add(this.dirLight);
     // spotlight
     this.spotLight = new THREE.SpotLight(0xffaa55);
-    this.spotLight.position.set(120, 30, 0);
+    this.spotLight.position.set(100, 50, 0);
     this.spotLight.castShadow = true;
     this.dirLight.shadow.camera.near = 10;
     this.scene.add(this.spotLight);
-    // const ambientLight = new THREE.AmbientLight(0xffaa55);
-    // this.scene.add(ambientLight);
+    // Ambient light
+    const ambientLight = new THREE.AmbientLight(0x020202);
+    this.scene.add(ambientLight);
+  }
+
+  setupCube() {
+    const side = 20;
+    const geometry = new THREE.CubeGeometry(side, side, side);
+    const material = new THREE.MeshLambertMaterial({ color: 0xFBBC05 });
+    const cube = new THREE.Mesh(geometry, material);
+    cube.position.set(0, side / 2, 0);
+    this.scene.add(cube);
   }
 
   setupHelpers() {
     // floor grid helper
     const gridHelper = new THREE.GridHelper(200, 16);
     this.scene.add(gridHelper);
+
     // XYZ axes helper (XYZ axes are RGB colors, respectively)
     const axisHelper = new THREE.AxisHelper(75);
     this.scene.add(axisHelper);
+
     // directional light helper + shadow camera helper
     const dirLightHelper = new THREE.DirectionalLightHelper(this.dirLight, 10);
     this.scene.add(dirLightHelper);
     const dirLightCameraHelper = new THREE.CameraHelper(this.dirLight.shadow.camera);
     this.scene.add(dirLightCameraHelper);
+
     // spot light helper + shadow camera helper
     const spotLightHelper = new THREE.SpotLightHelper(this.spotLight);
     this.scene.add(spotLightHelper);
@@ -161,16 +167,18 @@ class Application {
 
   setupGUI() {
     const gui = new dat.GUI();
-    gui.add(this.camera.position, 'x').name('Camera X').min(0).max(100);
-    gui.add(this.camera.position, 'y').name('Camera Y').min(0).max(100);
-    gui.add(this.camera.position, 'z').name('Camera Z').min(0).max(100);
+    const f = gui.addFolder('Camera');
+    f.add(this.camera.position, 'x').name('Camera X').min(0).max(100);
+    f.add(this.camera.position, 'y').name('Camera Y').min(0).max(100);
+    f.add(this.camera.position, 'z').name('Camera Z').min(0).max(100);
+    f.open();
   }
 
   setupCustomObject() {
     // create an object that uses custom shaders
     this.delta = 0;
     const customUniforms = {
-      delta: { value: 0 },
+      delta: { value: 0 }
     };
 
     const material = new THREE.ShaderMaterial({
@@ -200,12 +208,11 @@ class Application {
     for (let i = 0; i < this.vertexDisplacement.length; i += 1) {
       this.vertexDisplacement[i] = 0.5 + (Math.sin(i + this.delta) * 0.25);
     }
-    // attribute buffers are not refreshed automatically. To update custom
-    // attributes we need to set the needsUpdate flag to true
+    // attribute buffers are not refreshed automatically, so we need to set the needsUpdate flag to true
     this.customMesh.geometry.attributes.vertexDisplacement.needsUpdate = true;
   }
 
-  addParticleSystem() {
+  setupParticleSystem() {
     const geometry = new THREE.Geometry();
 
     const count = 500;
@@ -222,8 +229,7 @@ class Application {
       size: 5,
       map: texture,
       transparent: true,
-      // alphaTest's default is 0 and the particles overlap. Any value > 0
-      // prevents the particles from overlapping.
+      // alphaTest's default is 0 and the particles overlap. Any value > 0 prevents the particles from overlapping.
       alphaTest: 0.5,
     });
 
@@ -232,7 +238,7 @@ class Application {
     this.scene.add(particleSystem);
   }
 
-  addGroupObject() {
+  setupGroupObject() {
     const group = new THREE.Group();
     const side = 5;
     const geometry = new THREE.BoxGeometry(side, side, side);
