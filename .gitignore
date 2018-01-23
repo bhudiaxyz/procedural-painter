@@ -1,19 +1,27 @@
-# Build and Release Folders
-bin/
-bin-debug/
-bin-release/
-[Oo]bj/ # FlashDevelop obj
-[Bb]in/ # FlashDevelop bin
+# NodeJS
+node_modules/
+bower_components/
 
-# Other files and folders
-.settings/
+# Junk
+.DS_Store
+yarn.lock
+*.log
 
-# Executables
-*.swf
-*.air
-*.ipa
-*.apk
+# editor
+.vscode/
+.idea/
+*.iml
 
-# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
-# should NOT be excluded as they contain compiler settings and other important
-# information for Eclipse / Flash Builder.
+# Build
+target/
+out/
+build/
+
+# linters
+.eslintrc.json
+.sass-lint.yml
+
+# Build
+output/*.png
+output/*.jpg
+video/
