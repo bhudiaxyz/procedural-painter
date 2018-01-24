@@ -38,7 +38,10 @@ module.exports = {
       {
         test: /\.css$/,
         include: path.join(__dirname, 'src', 'css'),
-        use: ExtractTextPlugin.extract({fallback: 'style-loader', use: 'css-loader'})
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader']
+        })
       },
       // rule for .sass files
       {
@@ -46,24 +49,24 @@ module.exports = {
         include: [
           path.join(__dirname, 'src', 'sass')
         ],
-        use: ExtractTextPlugin.extract({fallback: 'style-loader', use: ['css-loader', 'sass-loader']})
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader', 'sass-loader']
+        })
       },
-      // rule for GLSL shaders files
+      // rule for .glsl files (shaders)
       {
         test: /\.(glsl|vert|frag)$/,
-        use: [
-          {
-            loader: 'webpack-glsl-loader'
-          }
-        ]
+        use: {
+          loader: 'webpack-glsl-loader'
+        }
       },
       // rule for textures (images)
       {
         test: /\.(jpe?g|png)$/i,
         include: path.join(__dirname, 'src', 'textures'),
         loaders: [
-          'file-loader',
-          {
+          'file-loader', {
             loader: 'image-webpack-loader',
             query: {
               progressive: true,
@@ -80,8 +83,6 @@ module.exports = {
     ]
   },
 
-  devtool: 'cheap-source-map',
-
   plugins: [
     new CleanWebpackPlugin(
       ['dist'],
@@ -91,34 +92,34 @@ module.exports = {
       template: path.join(__dirname, 'src', 'templates', 'index.html'),
       hash: true,
       filename: 'index.html',
-      chunks: ['commons', 'home']
+      chunks: ['commons', 'home'],
+      minify: {
+        collapseWhitespace: true,
+        collapseInlineTagWhitespace: true,
+        removeComments: true,
+        removeRedundantAttributes: true
+      }
     }),
+    new webpack.HashedModuleIdsPlugin(),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'commons',
       filename: '[name].[chunkhash].bundle.js',
-      chunks: ['home']
+      chunks: ['home'],
+      minify: {
+        collapseWhitespace: true,
+        collapseInlineTagWhitespace: true,
+        removeComments: true,
+        removeRedundantAttributes: true
+      }
     }),
     new CompressionPlugin({
       asset: '[path].gz[query]',
       algorithm: 'gzip',
-      test: /\.(js|html)$/,
+      test: /\.(js|css|html)$/,
       threshold: 10240,
       minRatio: 0.8
-    }),
+    })
   ],
-
-  devServer: {
-    host: 'localhost',
-    port: 8080,
-    contentBase: path.join(__dirname, 'dist'),
-    inline: true, // live reloading
-    stats: {
-      colors: true,
-      reasons: true,
-      chunks: false,
-      modules: false
-    }
-  },
 
   performance: {
     hints: 'warning'
