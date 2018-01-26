@@ -1,3 +1,5 @@
+precision highp float;
+
 uniform float delta;
 varying float vOpacity;
 varying vec3 vUv;

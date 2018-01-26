@@ -21,50 +21,50 @@ module.exports = {
 
   module: {
     rules: [
+      // rule for .json files
+      {
+        test: /\.(json)$/,
+        use: {loader: 'json-loader'}
+      },
       // rule for .js/.jsx files
       {
         test: /\.(js|jsx)$/,
-        include: [
-          path.join(__dirname, 'js', 'src')
-        ],
-        exclude: [
-          path.join(__dirname, 'node_modules')
-        ],
-        use: {
-          loader: 'babel-loader'
-        }
+        include: [path.join(__dirname, 'js', 'src')],
+        exclude: [path.join(__dirname, 'node_modules')],
+        use: {loader: 'babel-loader'}
       },
+
       // rule for .css files
       {
         test: /\.css$/,
-        include: path.join(__dirname, 'src', 'css'),
+        include: [path.join(__dirname, 'src', 'css')],
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
           use: ['css-loader']
         })
       },
+
       // rule for .sass files
       {
         test: /\.(sass|scss)$/,
-        include: [
-          path.join(__dirname, 'src', 'sass')
-        ],
+        include: [path.join(__dirname, 'src', 'sass')],
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
           use: ['css-loader', 'sass-loader']
         })
       },
+
       // rule for .glsl files (shaders)
       {
         test: /\.(glsl|vert|frag)$/,
-        use: {
-          loader: 'webpack-glsl-loader'
-        }
+        include: [path.join(__dirname, 'src', 'glsl')],
+        use: {loader: 'webpack-glsl-loader'}
       },
+
       // rule for textures (images)
       {
         test: /\.(jpe?g|png)$/i,
-        include: path.join(__dirname, 'src', 'textures'),
+        include: [path.join(__dirname, 'src', 'textures')],
         loaders: [
           'file-loader', {
             loader: 'image-webpack-loader',
@@ -74,7 +74,7 @@ module.exports = {
               interlaced: false,
               pngquant: {
                 quality: '65-90',
-                speed: 4,
+                speed: 4
               }
             }
           }

@@ -5,8 +5,10 @@ var dat = require('dat.gui/build/dat.gui.js');
 
 const checkerboard = require('../textures/checkerboard.jpg');
 const star = require('../textures/star.png');
-const vertexShader = require('../glsl/vertexShader.glsl');
-const fragmentShader = require('../glsl/fragmentShader.glsl');
+
+// /* eslint import/no-webpack-loader-syntax: off */
+import * as vertexShader from '!raw-loader!glslify-loader!../glsl/vertexShader.glsl';
+import * as fragmentShader from '!raw-loader!glslify-loader!../glsl/fragmentShader.glsl';
 
 require('../sass/home.sass');
 
