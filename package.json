@@ -45,10 +45,12 @@
     "gl-mat4": "^1.1.4",
     "glsl-diffuse-lambert": "^1.0.0",
     "glsl-noise": "0.0.0",
+    "interpolation": "^1.0.0",
     "orbit-controls-es6": "^1.0.10",
     "simplex-noise": "^2.3.0",
     "stats.js": "^0.17.0",
-    "three": "^0.89.0"
+    "three": "^0.89.0",
+    "vecmath": "^0.1.4"
   },
   "devDependencies": {
     "babel-core": "^6.14.0",

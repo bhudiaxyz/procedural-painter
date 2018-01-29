@@ -1,14 +1,16 @@
 import * as THREE from 'three';
 import OrbitControls from 'orbit-controls-es6';
 import * as Detector from '../js/vendor/Detector';
+
 var dat = require('dat.gui/build/dat.gui.js');
+var Stats = require('stats.js');
 
 const checkerboard = require('../textures/checkerboard.jpg');
 const star = require('../textures/star.png');
 
 // /* eslint import/no-webpack-loader-syntax: off */
-import * as vertexShader from '!raw-loader!glslify-loader!../glsl/vertexShader.glsl';
-import * as fragmentShader from '!raw-loader!glslify-loader!../glsl/fragmentShader.glsl';
+import * as meshVertShader from '!raw-loader!glslify-loader!../glsl/vertexShader.glsl';
+import * as meshFragShader from '!raw-loader!glslify-loader!../glsl/fragmentShader.glsl';
 
 require('../sass/home.sass');
 
@@ -39,47 +41,52 @@ class Application {
 
   init() {
     this.scene = new THREE.Scene();
+    this.stats = new Stats();
+
     this.setupRenderer();
     this.setupCamera();
     this.setupLights();
     this.setupHelpers();
     this.setupFloor();
     this.setupControls();
+
     this.setupCube();
-
-    this.setupGUI();
-
     this.setupCustomObject();
     this.setupParticleSystem();
     this.setupGroupObject();
+
+    this.setupParamsControl();
   }
 
   render() {
+    this.stats.update();
     this.controls.update();
     this.updateCustomObject();
     this.renderer.render(this.scene, this.camera);
-    // when render is invoked via requestAnimationFrame(this.render) there is
-    // no 'this', so either we bind it explicitly or use an es6 arrow function.
-    // requestAnimationFrame(this.render.bind(this));
+    // when render is invoked via requestAnimationFrame(this.render) there is no 'this',
+    // so either we bind it explicitly like so: requestAnimationFrame(this.render.bind(this));
+    // or use an es6 arrow function like so:
     requestAnimationFrame(() => this.render());
   }
 
   static createContainer() {
     const div = document.createElement('div');
-    div.setAttribute('id', 'canvas-container');
     div.setAttribute('class', 'container');
+    div.setAttribute('id', 'canvas-container');
     // div.setAttribute('width', window.innerWidth);
     // div.setAttribute('height', window.innerHeight);
     return div;
   }
 
   setupRenderer() {
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer = new THREE.WebGLRenderer({antialias: true});
     // this.renderer.setClearColor(0xd3d3d3);  // it's a light gray
     this.renderer.setClearColor(0x222222);  // it's a dark gray
     this.renderer.setPixelRatio(window.devicePixelRatio || 1);
     this.renderer.setSize(this.width, this.height);
     this.renderer.shadowMap.enabled = true;
+
+    this.container.appendChild(this.stats.dom);
     this.container.appendChild(this.renderer.domElement);
   }
 
@@ -101,12 +108,14 @@ class Application {
     this.dirLight.castShadow = true;
     this.dirLight.shadow.camera.near = 10;
     this.scene.add(this.dirLight);
+
     // spotlight
     this.spotLight = new THREE.SpotLight(0xffaa55);
     this.spotLight.position.set(100, 50, 0);
     this.spotLight.castShadow = true;
     this.dirLight.shadow.camera.near = 10;
     this.scene.add(this.spotLight);
+
     // Ambient light
     const ambientLight = new THREE.AmbientLight(0x020202);
     this.scene.add(ambientLight);
@@ -115,7 +124,7 @@ class Application {
   setupCube() {
     const side = 20;
     const geometry = new THREE.CubeGeometry(side, side, side);
-    const material = new THREE.MeshLambertMaterial({ color: 0xFBBC05 });
+    const material = new THREE.MeshLambertMaterial({color: 0xFBBC05});
     const cube = new THREE.Mesh(geometry, material);
     cube.position.set(0, side / 2, 0);
     this.scene.add(cube);
@@ -167,7 +176,7 @@ class Application {
     this.controls.autoRotate = true;
   }
 
-  setupGUI() {
+  setupParamsControl() {
     const gui = new dat.GUI();
     const f = gui.addFolder('Camera');
     f.add(this.camera.position, 'x').name('Camera X').min(0).max(100);
@@ -180,12 +189,12 @@ class Application {
     // create an object that uses custom shaders
     this.delta = 0;
     const customUniforms = {
-      delta: { value: 0 }
+      delta: {value: 0}
     };
 
     const material = new THREE.ShaderMaterial({
-      vertexShader,
-      fragmentShader,
+      vertexShader: meshVertShader,
+      fragmentShader: meshFragShader,
       uniforms: customUniforms,
     });
 
@@ -220,9 +229,9 @@ class Application {
     const count = 500;
     for (let i = 0; i < count; i += 1) {
       const particle = new THREE.Vector3();
-      particle.x = THREE.Math.randFloatSpread(50);
-      particle.y = THREE.Math.randFloatSpread(50);
-      particle.z = THREE.Math.randFloatSpread(50);
+      particle.x = THREE.Math.randFloatSpread(55);
+      particle.y = THREE.Math.randFloatSpread(55);
+      particle.z = THREE.Math.randFloatSpread(55);
       geometry.vertices.push(particle);
     }
 
