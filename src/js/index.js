@@ -1,19 +1,24 @@
 import * as THREE from 'three';
 import OrbitControls from 'orbit-controls-es6';
-import * as Detector from '../js/vendor/Detector';
+import * as Detector from './vendor/Detector';
 
 var dat = require('dat.gui/build/dat.gui.js');
 var Stats = require('stats.js');
 
 const checkerboard = require('../textures/checkerboard.jpg');
 const star = require('../textures/star.png');
+const skybox_px = require('../textures/sky/dark-s_px.jpg');
+const skybox_nx = require('../textures/sky/dark-s_nx.jpg');
+const skybox_py = require('../textures/sky/dark-s_py.jpg');
+const skybox_ny = require('../textures/sky/dark-s_ny.jpg');
+const skybox_pz = require('../textures/sky/dark-s_pz.jpg');
+const skybox_nz = require('../textures/sky/dark-s_nz.jpg');
 
 // /* eslint import/no-webpack-loader-syntax: off */
 import * as meshVertShader from '!raw-loader!glslify-loader!../glsl/vertexShader.glsl';
 import * as meshFragShader from '!raw-loader!glslify-loader!../glsl/fragmentShader.glsl';
 
 require('../sass/home.sass');
-
 
 class Application {
   constructor(opts = {}) {
@@ -54,6 +59,7 @@ class Application {
     this.setupCustomObject();
     this.setupParticleSystem();
     this.setupGroupObject();
+    this.setupSkyBox();
 
     this.setupParamsControl();
   }
@@ -153,14 +159,14 @@ class Application {
   }
 
   setupFloor() {
-    const geometry = new THREE.PlaneGeometry(100, 100, 1, 1);
+    const geometry = new THREE.PlaneGeometry(200, 200, 1, 1);
     const texture = new THREE.TextureLoader().load(checkerboard);
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.set(4, 4);
     const material = new THREE.MeshBasicMaterial({
       side: THREE.DoubleSide,
-      map: texture,
+      map: texture
     });
     const floor = new THREE.Mesh(geometry, material);
     floor.position.y = -0.5;
@@ -254,7 +260,7 @@ class Application {
     const side = 5;
     const geometry = new THREE.BoxGeometry(side, side, side);
     const material = new THREE.MeshLambertMaterial({
-      color: 0x228b22, // forest green
+      color: 0x778b77, // forest green
     });
 
     for (let i = 0; i < 50; i += 1) {
@@ -271,6 +277,28 @@ class Application {
     this.scene.add(group);
   }
 
+  setupSkyBox() {
+    // Spacesky Shader
+    const N = 6;
+    const two_n = Math.pow(2, N);
+    let loader = new THREE.CubeTextureLoader();
+
+    const textureCube = loader.load([
+      skybox_px, skybox_nx,
+      skybox_py, skybox_ny,
+      skybox_pz, skybox_nz
+    ]);
+    const spaceskyMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(5000, two_n, two_n),
+      new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        envMap: textureCube,
+        side: THREE.BackSide,
+        transparent: true
+      })
+    );
+    this.scene.add(spaceskyMesh);
+  }
 }
 
 // wrap everything inside a function scope and invoke it (IIFE, a.k.a. SEAF)

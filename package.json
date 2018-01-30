@@ -1,7 +1,7 @@
 {
-  "title": "Procedural Painter",
   "name": "procedural-painter",
   "version": "1.0.0",
+  "title": "Procedural Painter",
   "description": "Procedural Painter",
   "main": "./src/js/index.js",
   "scripts": {
@@ -9,8 +9,7 @@
     "build": "webpack --config webpack.prod.js --progress",
     "start": "webpack-dev-server --config webpack.dev.js --open",
     "deploy": "git push origin :gh-pages && git subtree push --prefix dist origin gh-pages",
-    "watch": "webpack --config webpack.dev.js --progress --watch",
-    "update:packages": "node wipe-dependencies.js && rm -rf node_modules && npm update --save-dev && npm update --save"
+    "watch": "webpack --config webpack.dev.js --progress --watch"
   },
   "repository": {
     "type": "git",
@@ -43,6 +42,7 @@
     "alea": "0.0.9",
     "dat.gui": "^0.7.0",
     "gl-mat4": "^1.1.4",
+    "glsl-atmosphere": "^2.0.0",
     "glsl-diffuse-lambert": "^1.0.0",
     "glsl-noise": "0.0.0",
     "interpolation": "^1.0.0",
@@ -69,7 +69,7 @@
     "html-webpack-plugin": "^2.30.0",
     "image-webpack-loader": "^4.0.0",
     "json-loader": "^0.5.4",
-    "node-sass": "^4.5.3",
+    "node-sass": "^4.7.2",
     "raw-loader": "^0.5.1",
     "sass-lint": "^1.12.1",
     "sass-loader": "^6.0.6",
