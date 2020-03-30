@@ -5,6 +5,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 
+function dir_path(dir) {
+  return path.join(__dirname, dir)
+}
+
 module.exports = {
 
   entry: {
@@ -18,6 +22,10 @@ module.exports = {
   },
 
   target: 'web',
+  devtool: 'source-map',
+  devServer: {
+    port: 7000
+  },
 
   module: {
     rules: [
@@ -26,10 +34,11 @@ module.exports = {
         test: /\.(json)$/,
         use: {loader: 'json-loader'}
       },
+
       // rule for .js/.jsx files
       {
         test: /\.(js|jsx)$/,
-        include: [path.join(__dirname, 'js', 'src')],
+        include: [path.join(__dirname, 'src', 'js')],
         exclude: [path.join(__dirname, 'node_modules')],
         use: {loader: 'babel-loader'}
       },
@@ -54,10 +63,28 @@ module.exports = {
         })
       },
 
-      // rule for .glsl files (shaders)
+      // rules for .glsl files (shaders)
+      {
+        test: /\.(glsl|frag|vert)$/,
+        include: [path.join(__dirname, 'src', 'glsl')],
+        exclude: /node_modules/,
+        use: {loader: 'glslify-import-loader'}
+      },
+      {
+        test: /\.(glsl|frag|vert)$/,
+        include: [path.join(__dirname, 'src', 'glsl')],
+        exclude: /node_modules/,
+        use: {loader: 'raw-loader'}
+      },
+      {
+        test: /\.(glsl|frag|vert)$/,
+        include: [path.join(__dirname, 'src', 'glsl')],
+        use: {loader: 'glslify-loader'}
+      },
       {
         test: /\.(glsl|vert|frag)$/,
         include: [path.join(__dirname, 'src', 'glsl')],
+        exclude: /node_modules/,
         use: {loader: 'webpack-glsl-loader'}
       },
 
@@ -65,7 +92,7 @@ module.exports = {
       {
         test: /\.(jpe?g|png)$/i,
         include: [path.join(__dirname, 'src', 'textures')],
-        loaders: [
+        loader: [
           'file-loader', {
             loader: 'image-webpack-loader',
             query: {
@@ -85,10 +112,15 @@ module.exports = {
 
   plugins: [
     new CleanWebpackPlugin(
-      ['dist'],
-      {root: __dirname, exclude: ['favicon.ico'], verbose: true}),
+      ['dist'], {
+        root: __dirname,
+        exclude: ['favicon.ico'],
+        verbose: true
+      }
+    ),
     new ExtractTextPlugin('[name].[chunkhash].bundle.css'),
     new HtmlWebpackPlugin({
+      favicon: 'favicon.ico',
       template: path.join(__dirname, 'src', 'templates', 'index.html'),
       hash: true,
       filename: 'index.html',
@@ -101,19 +133,8 @@ module.exports = {
       }
     }),
     new webpack.HashedModuleIdsPlugin(),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'commons',
-      filename: '[name].[chunkhash].bundle.js',
-      chunks: ['home'],
-      minify: {
-        collapseWhitespace: true,
-        collapseInlineTagWhitespace: true,
-        removeComments: true,
-        removeRedundantAttributes: true
-      }
-    }),
     new CompressionPlugin({
-      asset: '[path].gz[query]',
+      filename: '[path].gz[query]',
       algorithm: 'gzip',
       test: /\.(js|css|html)$/,
       threshold: 10240,
@@ -123,6 +144,14 @@ module.exports = {
 
   performance: {
     hints: 'warning'
-  }
+  },
+
+  optimization: {
+    splitChunks: {
+      name: "commons",
+      minChunks: 3,
+      filename: '[name].[chunkhash].bundle.js'
+    }
+  },
 
 };
