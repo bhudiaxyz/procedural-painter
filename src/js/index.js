@@ -1,6 +1,7 @@
 import * as THREE from 'three';
+
 import OrbitControls from 'orbit-controls-es6';
-import * as Detector from './vendor/Detector';
+import WEBGL from './vendor/WebGL';
 
 var dat = require('dat.gui/build/dat.gui.js');
 var Stats = require('stats.js');
@@ -15,10 +16,12 @@ const skybox_pz = require('../textures/sky/dark-s_pz.jpg');
 const skybox_nz = require('../textures/sky/dark-s_nz.jpg');
 
 // /* eslint import/no-webpack-loader-syntax: off */
-import * as meshVertShader from '!raw-loader!glslify-loader!../glsl/vertexShader.glsl';
-import * as meshFragShader from '!raw-loader!glslify-loader!../glsl/fragmentShader.glsl';
+import * as meshVertShader from '!raw-loader!glslify-loader!../shaders/vertexShader.glsl';
+import * as meshFragShader from '!raw-loader!glslify-loader!../shaders/fragmentShader.glsl';
 
 require('../sass/home.sass');
+
+const GROUP_SIZE = 50;
 
 class Application {
   constructor(opts = {}) {
@@ -33,13 +36,11 @@ class Application {
       this.container = div;
     }
 
-    if (Detector.webgl) {
+    if (WEBGL.isWebGLAvailable()) {
       this.init();
       this.render();
     } else {
-      // TODO: style warning message
-      console.log('WebGL NOT supported in your browser!');
-      const warning = Detector.getWebGLErrorMessage();
+      var warning = WEBGL.getWebGLErrorMessage();
       this.container.appendChild(warning);
     }
   }
@@ -67,7 +68,7 @@ class Application {
   render() {
     this.stats.update();
     this.controls.update();
-    this.updateCustomObject();
+    this.animate();
     this.renderer.render(this.scene, this.camera);
     // when render is invoked via requestAnimationFrame(this.render) there is no 'this',
     // so either we bind it explicitly like so: requestAnimationFrame(this.render.bind(this));
@@ -104,7 +105,6 @@ class Application {
     this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
     this.camera.position.set(100, 100, 100);
     this.camera.lookAt(this.scene.position);
-    // this.camera.lookAt(new THREE.Vector3(0, 0, 0));
   }
 
   setupLights() {
@@ -133,6 +133,7 @@ class Application {
     const material = new THREE.MeshLambertMaterial({color: 0xFBBC05});
     const cube = new THREE.Mesh(geometry, material);
     cube.position.set(0, side / 2, 0);
+    this.cube = cube;
     this.scene.add(cube);
   }
 
@@ -218,17 +219,6 @@ class Application {
     this.scene.add(this.customMesh);
   }
 
-  updateCustomObject() {
-    // update an object that uses custom shaders
-    this.delta += 0.1;
-    this.customMesh.material.uniforms.delta.value = 0.5 + (Math.sin(this.delta) * 0.5);
-    for (let i = 0; i < this.vertexDisplacement.length; i += 1) {
-      this.vertexDisplacement[i] = 0.5 + (Math.sin(i + this.delta) * 0.25);
-    }
-    // attribute buffers are not refreshed automatically, so we need to set the needsUpdate flag to true
-    this.customMesh.geometry.attributes.vertexDisplacement.needsUpdate = true;
-  }
-
   setupParticleSystem() {
     const geometry = new THREE.Geometry();
 
@@ -263,7 +253,7 @@ class Application {
       color: 0x778b77, // forest green
     });
 
-    for (let i = 0; i < 50; i += 1) {
+    for (let i = 0; i < GROUP_SIZE; i += 1) {
       const mesh = new THREE.Mesh(geometry, material);
       mesh.position.x = THREE.Math.randFloatSpread(50);
       mesh.position.y = THREE.Math.randFloatSpread(50);
@@ -274,6 +264,7 @@ class Application {
       group.add(mesh);
     }
     group.position.set(50, 20, 50);
+    this.group = group;
     this.scene.add(group);
   }
 
@@ -298,6 +289,31 @@ class Application {
       })
     );
     this.scene.add(spaceskyMesh);
+  }
+
+  animate() {
+    // update an object that uses custom shaders
+    this.delta += 0.1;
+    this.cube.rotation.y += 0.01;
+
+    this.group.rotation.y -= 0.01;
+    for (let i = 0; i < GROUP_SIZE; i += 1) {
+      if (i % 2 == 0) {
+        this.group.children[i].rotation.x += 0.03;
+      }
+      if (i % 3 == 0) {
+        this.group.children[i].rotation.y += 0.04;
+      } else {
+        this.group.children[i].rotation.z += 0.02;
+      }
+    }
+
+    this.customMesh.material.uniforms.delta.value = 0.5 + (Math.sin(this.delta) * 0.5);
+    for (let i = 0; i < this.vertexDisplacement.length; i += 1) {
+      this.vertexDisplacement[i] = 0.5 + (Math.sin(i + this.delta) * 0.25);
+    }
+    // attribute buffers are not refreshed automatically, so we need to set the needsUpdate flag to true
+    this.customMesh.geometry.attributes.vertexDisplacement.needsUpdate = true;
   }
 }
 

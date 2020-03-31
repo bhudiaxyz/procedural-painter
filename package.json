@@ -25,23 +25,6 @@
     "deploy": "git push origin :gh-pages && git subtree push --prefix dist origin gh-pages",
     "watch": "webpack --config webpack.dev.js --progress --watch"
   },
-  "keywords": [
-    "procedural",
-    "perlin",
-    "noise",
-    "generated",
-    "computer",
-    "graphics",
-    "opengl",
-    "webgl",
-    "threejs",
-    "three",
-    "webpack",
-    "webpack2",
-    "es6",
-    "babel",
-    "sass"
-  ],
   "dependencies": {
     "gl-matrix": "^2.3.2",
     "three": "^0.115.0",
@@ -97,5 +80,22 @@
     "webpack-dev-server": "3.7.2",
     "webpack-glsl-loader": "^1.0.1",
     "webpack-merge": "^4.2.2"
-  }
+  },
+  "keywords": [
+    "procedural",
+    "perlin",
+    "noise",
+    "generated",
+    "computer",
+    "graphics",
+    "opengl",
+    "webgl",
+    "threejs",
+    "three",
+    "webpack",
+    "webpack2",
+    "es6",
+    "babel",
+    "sass"
+  ]
 }
