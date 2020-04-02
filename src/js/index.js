@@ -205,11 +205,11 @@ class Application {
       uniforms: customUniforms,
     });
 
-    const geometry = new THREE.SphereBufferGeometry(5, 32, 32);
+    const geometry = new THREE.SphereBufferGeometry(5, 64, 64);
 
     this.vertexDisplacement = new Float32Array(geometry.attributes.position.count);
     for (let i = 0; i < this.vertexDisplacement.length; i += 1) {
-      this.vertexDisplacement[i] = Math.sin(i);
+      this.vertexDisplacement[i] = Math.sin(i) * Math.random() * .75 + Math.cos(i) * Math.random() * .25;
     }
 
     geometry.addAttribute('vertexDisplacement', new THREE.BufferAttribute(this.vertexDisplacement, 1));
@@ -242,7 +242,8 @@ class Application {
 
     const particleSystem = new THREE.Points(geometry, material);
     particleSystem.position.set(-50, 50, -50);
-    this.scene.add(particleSystem);
+    this.particleSystem = particleSystem;
+    this.scene.add(this.particleSystem);
   }
 
   setupGroupObject() {
@@ -265,7 +266,7 @@ class Application {
     }
     group.position.set(50, 20, 50);
     this.group = group;
-    this.scene.add(group);
+    this.scene.add(this.group);
   }
 
   setupSkyBox() {
@@ -296,15 +297,19 @@ class Application {
     this.delta += 0.1;
     this.cube.rotation.y += 0.01;
 
+    this.particleSystem.rotation.y += 0.01;
+    this.particleSystem.rotation.z -= 0.01;
+
     this.group.rotation.y -= 0.01;
     for (let i = 0; i < GROUP_SIZE; i += 1) {
-      if (i % 2 == 0) {
-        this.group.children[i].rotation.x += 0.03;
+      if (i % 2 === 0) {
+        this.group.children[i].rotation.x += 0.02;
       }
-      if (i % 3 == 0) {
-        this.group.children[i].rotation.y += 0.04;
-      } else {
-        this.group.children[i].rotation.z += 0.02;
+      if (i % 3 === 0) {
+        this.group.children[i].rotation.y += 0.03;
+      }
+      if (i % 4 === 0) {
+        this.group.children[i].rotation.z += 0.04;
       }
     }
 

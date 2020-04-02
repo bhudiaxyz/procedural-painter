@@ -1,11 +1,13 @@
 precision highp float;
 
+#pragma glslify: pnoise = require(glsl-noise/periodic/3d)
+
 attribute float vertexDisplacement;
+
 uniform float delta;
+
 varying float vOpacity;
 varying vec3 vUv;
-
-#pragma glslify: pnoise = require(glsl-noise/periodic/3d)
 
 const float PI = 3.14159265358979323846264;
 const vec3 noiseVec3 = vec3(PI);
