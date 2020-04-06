@@ -1,25 +1,26 @@
 import * as THREE from 'three';
 
+import 'bootstrap';
+import '../scss/index.scss';
+
 import OrbitControls from 'orbit-controls-es6';
-import WEBGL from './vendor/WebGL';
+import WEBGL from './utils/WebGL';
 
 var dat = require('dat.gui/build/dat.gui.js');
 var Stats = require('stats.js');
 
-const checkerboard = require('../textures/checkerboard.jpg');
-const star = require('../textures/star.png');
-const skybox_px = require('../textures/sky/dark-s_px.jpg');
-const skybox_nx = require('../textures/sky/dark-s_nx.jpg');
-const skybox_py = require('../textures/sky/dark-s_py.jpg');
-const skybox_ny = require('../textures/sky/dark-s_ny.jpg');
-const skybox_pz = require('../textures/sky/dark-s_pz.jpg');
-const skybox_nz = require('../textures/sky/dark-s_nz.jpg');
+const checkerboard = require('../assets/textures/checkerboard.jpg');
+const star = require('../assets/textures/star.png');
+const skybox_px = require('../assets/textures/sky/dark-s_px.jpg');
+const skybox_nx = require('../assets/textures/sky/dark-s_nx.jpg');
+const skybox_py = require('../assets/textures/sky/dark-s_py.jpg');
+const skybox_ny = require('../assets/textures/sky/dark-s_ny.jpg');
+const skybox_pz = require('../assets/textures/sky/dark-s_pz.jpg');
+const skybox_nz = require('../assets/textures/sky/dark-s_nz.jpg');
 
 // /* eslint import/no-webpack-loader-syntax: off */
-import * as meshVertShader from '!raw-loader!glslify-loader!../shaders/vertexShader.glsl';
-import * as meshFragShader from '!raw-loader!glslify-loader!../shaders/fragmentShader.glsl';
-
-require('../sass/home.sass');
+import * as meshVertShader from '!raw-loader!glslify-loader!./shaders/vertexShader.glsl';
+import * as meshFragShader from '!raw-loader!glslify-loader!./shaders/fragmentShader.glsl';
 
 const GROUP_SIZE = 50;
 
