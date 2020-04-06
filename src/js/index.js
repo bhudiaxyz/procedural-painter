@@ -1,4 +1,6 @@
-import * as THREE from 'three';
+import * as Alea from "alea";
+
+global.THREE = require('three');
 
 import 'bootstrap';
 import '../scss/index.scss';
@@ -21,6 +23,7 @@ const skybox_nz = require('../assets/textures/sky/dark-s_nz.jpg');
 // /* eslint import/no-webpack-loader-syntax: off */
 import * as meshVertShader from '!raw-loader!glslify-loader!./shaders/vertexShader.glsl';
 import * as meshFragShader from '!raw-loader!glslify-loader!./shaders/fragmentShader.glsl';
+import * as SimplexNoise from "simplex-noise";
 
 const GROUP_SIZE = 50;
 
@@ -39,7 +42,7 @@ class Application {
 
     if (WEBGL.isWebGLAvailable()) {
       this.init();
-      this.render();
+      this.animate();
     } else {
       var warning = WEBGL.getWebGLErrorMessage();
       this.container.appendChild(warning);
@@ -47,9 +50,10 @@ class Application {
   }
 
   init() {
-    this.scene = new THREE.Scene();
-    this.stats = new Stats();
+    // Preamble of standard stuff expected everywhere
+    this.prepareInit();
 
+    // Standard scene stuff
     this.setupRenderer();
     this.setupCamera();
     this.setupLights();
@@ -64,17 +68,46 @@ class Application {
     this.setupSkyBox();
 
     this.setupParamsControl();
+
+    window.addEventListener('resize', () => this.onResize, false);
   }
 
-  render() {
+  prepareInit() {
+    this.scene = new THREE.Scene();
+    this.stats = new Stats();
+    this.random = new Alea();
+    this.noise = new SimplexNoise(this.random);
+    this.gui = new dat.GUI();
+
+    this.params = {
+      // General
+      rotate: true,
+      panRotate: true,
+      // Lighting
+      dirLightColor: 0x9f9f9f,
+      spotLightColor: 0xffffff,
+      ambLightColor: 0x040404,
+    };
+  }
+
+  onResize() {
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+
+    this.renderer.setSize(this.width, this.height);
+    this.camera.aspect = this.width / this.height;
+    this.camera.updateProjectionMatrix();
+  }
+
+  animate() {
     this.stats.update();
     this.controls.update();
-    this.animate();
+    this.update();
     this.renderer.render(this.scene, this.camera);
     // when render is invoked via requestAnimationFrame(this.render) there is no 'this',
     // so either we bind it explicitly like so: requestAnimationFrame(this.render.bind(this));
     // or use an es6 arrow function like so:
-    requestAnimationFrame(() => this.render());
+    requestAnimationFrame(() => this.animate());
   }
 
   static createContainer() {
@@ -110,22 +143,21 @@ class Application {
 
   setupLights() {
     // directional light
-    this.dirLight = new THREE.DirectionalLight(0x4682b4, 1); // steelblue
+    this.dirLight = new THREE.DirectionalLight(this.params.dirLightColor, 1);
     this.dirLight.position.set(120, 30, -200);
     this.dirLight.castShadow = true;
     this.dirLight.shadow.camera.near = 10;
     this.scene.add(this.dirLight);
 
     // spotlight
-    this.spotLight = new THREE.SpotLight(0xffaa55);
+    this.spotLight = new THREE.SpotLight(this.params.spotLightColor);
     this.spotLight.position.set(100, 50, 0);
     this.spotLight.castShadow = true;
-    this.dirLight.shadow.camera.near = 10;
     this.scene.add(this.spotLight);
 
     // Ambient light
-    const ambientLight = new THREE.AmbientLight(0x020202);
-    this.scene.add(ambientLight);
+    this.ambientLight = new THREE.AmbientLight(this.params.ambLightColor);
+    this.scene.add(this.ambientLight);
   }
 
   setupCube() {
@@ -185,8 +217,37 @@ class Application {
   }
 
   setupParamsControl() {
-    const gui = new dat.GUI();
-    const f = gui.addFolder('Camera');
+    let f = this.gui.addFolder("General");
+    f.add(this.params, 'rotate');
+    f.add(this.controls, 'autoRotate');
+    f.close();
+
+    f = this.gui.addFolder('Lighting');
+    f.add(this.dirLight.position, 'x').name('Directional X').min(-200).max(200);
+    f.add(this.dirLight.position, 'y').name('Directional Y').min(-200).max(200);
+    f.add(this.dirLight.position, 'z').name('Directional Z').min(-200).max(200);
+
+    let dirLightColorCtrl = f.addColor(this.params, 'dirLightColor').name('Directional Color').listen();
+    dirLightColorCtrl.onChange(function() {
+      this.dirLight.color.set(this.params.dirLightColor);
+      this.dirLightColor.set(this.dirLight.color.r, this.dirLight.color.g, this.dirLight.color.b, 1.0);
+    });
+
+    f.add(this.spotLight.position, 'x').name('Spot X').min(-200).max(200);
+    f.add(this.spotLight.position, 'y').name('Spot Y').min(-200).max(200);
+    f.add(this.spotLight.position, 'z').name('Spot Z').min(-200).max(200);
+    let spotLightColorCtrl = f.addColor(this.params, 'spotLightColor').name('Spot Color').listen();
+    spotLightColorCtrl.onChange(function() {
+      this.spotLight.color.set(this.params.spotLightColor);
+    });
+
+    let ambLightColorCtrl = f.addColor(this.params, 'ambLightColor').name('Ambient Color').listen();
+    ambLightColorCtrl.onChange(function() {
+      this.ambientLight.color.set(this.params.ambLightColor);
+    });
+    f.close();
+
+    f = this.gui.addFolder('Camera');
     f.add(this.camera.position, 'x').name('Camera X').min(0).max(100);
     f.add(this.camera.position, 'y').name('Camera Y').min(0).max(100);
     f.add(this.camera.position, 'z').name('Camera Z').min(0).max(100);
@@ -293,7 +354,7 @@ class Application {
     this.scene.add(spaceskyMesh);
   }
 
-  animate() {
+  update() {
     // update an object that uses custom shaders
     this.delta += 0.1;
     this.cube.rotation.y += 0.01;
