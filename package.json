@@ -40,6 +40,7 @@
     "interpolation": "^1.0.0",
     "jquery": "^3.4.1",
     "load-img": "^1.0.0",
+    "nice-color-palettes": "^2.0.0",
     "orbit-controls-es6": "^2.0.1",
     "popper.js": "^1.15.0",
     "seed-random": "^2.2.0",

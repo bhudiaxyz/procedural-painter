@@ -228,7 +228,7 @@ class Application {
     f.add(this.dirLight.position, 'z').name('Directional Z').min(-200).max(200);
 
     let dirLightColorCtrl = f.addColor(this.params, 'dirLightColor').name('Directional Color').listen();
-    dirLightColorCtrl.onChange(function() {
+    dirLightColorCtrl.onChange(function () {
       this.dirLight.color.set(this.params.dirLightColor);
       this.dirLightColor.set(this.dirLight.color.r, this.dirLight.color.g, this.dirLight.color.b, 1.0);
     });
@@ -237,12 +237,12 @@ class Application {
     f.add(this.spotLight.position, 'y').name('Spot Y').min(-200).max(200);
     f.add(this.spotLight.position, 'z').name('Spot Z').min(-200).max(200);
     let spotLightColorCtrl = f.addColor(this.params, 'spotLightColor').name('Spot Color').listen();
-    spotLightColorCtrl.onChange(function() {
+    spotLightColorCtrl.onChange(function () {
       this.spotLight.color.set(this.params.spotLightColor);
     });
 
     let ambLightColorCtrl = f.addColor(this.params, 'ambLightColor').name('Ambient Color').listen();
-    ambLightColorCtrl.onChange(function() {
+    ambLightColorCtrl.onChange(function () {
       this.ambientLight.color.set(this.params.ambLightColor);
     });
     f.close();
@@ -311,12 +311,14 @@ class Application {
   setupGroupObject() {
     const group = new THREE.Group();
     const side = 5;
-    const geometry = new THREE.BoxGeometry(side, side, side);
-    const material = new THREE.MeshLambertMaterial({
-      color: 0x778b77, // forest green
-    });
+    // const geometry = new THREE.BoxGeometry(side, side, side);
+    const geometry = new THREE.TorusBufferGeometry(5.7, 1.9, 10, 30);
 
     for (let i = 0; i < GROUP_SIZE; i += 1) {
+      const material = new THREE.MeshLambertMaterial({
+        color: new THREE.Color(Math.random(), Math.random(), Math.random())
+      });
+
       const mesh = new THREE.Mesh(geometry, material);
       mesh.position.x = THREE.Math.randFloatSpread(50);
       mesh.position.y = THREE.Math.randFloatSpread(50);
